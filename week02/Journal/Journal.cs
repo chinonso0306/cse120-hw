@@ -1,51 +1,72 @@
+// Author: Chinonso Daniel
+// Enhancement: Added functionality to save journal entries to a JSON database (file)
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 
-public class Journal
+namespace JournalApp
 {
-    public List<Entry> _entries = new List<Entry>();
-
-    public void AddEntry(Entry entry)
+    public class Journal
     {
-        _entries.Add(entry);
-    }
+        private List<Entry> _entries = new List<Entry>();
 
-    public void DisplayAll()
-    {
-        foreach (Entry entry in _entries)
+        public void AddEntry(Entry newEntry)
         {
-            entry.Display();
+            _entries.Add(newEntry);
         }
-    }
 
-    public void SaveToFile(string file)
-    {
-        using (StreamWriter outputFile = new StreamWriter(file))
+        public void DisplayAll()
         {
-            foreach (Entry entry in _entries)
+            foreach (var entry in _entries)
             {
-                outputFile.WriteLine($"{entry._date}|{entry._promptText}|{entry._entryText}");
+                entry.Display();
             }
         }
-    }
 
-    public void LoadFromFile(string file)
-    {
-        string[] lines = File.ReadAllLines(file);
-
-        _entries.Clear();
-
-        foreach (string line in lines)
+        public void SaveToFile(string file)
         {
-            string[] parts = line.Split("|");
+            try
+            {
+                var json = JsonSerializer.Serialize(_entries);
+                File.WriteAllText(file, json);
+                Console.WriteLine($"Journal saved to '{file}'.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving journal: {ex.Message}");
+            }
+        }
 
-            Entry entry = new Entry();
-            entry._date = parts[0];
-            entry._promptText = parts[1];
-            entry._entryText = parts[2];
-
-            _entries.Add(entry);
+        public void LoadFromFile(string file)
+        {
+            if (File.Exists(file))
+            {
+                var json = File.ReadAllText(file);
+                if (string.IsNullOrWhiteSpace(json))
+                {
+                    _entries = new List<Entry>();
+                    Console.WriteLine("Loaded file is empty. No entries found.");
+                }
+                else
+                {
+                    try
+                    {
+                        _entries = JsonSerializer.Deserialize<List<Entry>>(json) ?? new List<Entry>();
+                        Console.WriteLine($"Journal loaded from '{file}'.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error loading journal: {ex.Message}");
+                        _entries = new List<Entry>();
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine($"File '{file}' not found.");
+                _entries = new List<Entry>();
+            }
         }
     }
 }

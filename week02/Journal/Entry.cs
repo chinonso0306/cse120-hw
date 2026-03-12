@@ -1,14 +1,27 @@
 using System;
 
-public class Entry
+namespace JournalApp
 {
-    public string _date;
-    public string _promptText;
-    public string _entryText;
-
-    public void Display()
+    public class Entry
     {
-        Console.WriteLine($"{_date} - {_promptText}");
-        Console.WriteLine($"{_entryText}\n");
+        public string Date { get; set; }
+        public string PromptText { get; set; }
+        public string EntryText { get; set; }
+
+        public Entry() { }
+
+        public Entry(string date, string promptText, string entryText)
+        {
+            Date = date;
+            PromptText = promptText;
+            EntryText = entryText;
+        }
+
+        public void Display()
+        {
+            Console.WriteLine($"Date: {Date}");
+            Console.WriteLine($"Prompt: {PromptText}");
+            Console.WriteLine($"Entry: {EntryText}\n");
+        }
     }
 }
