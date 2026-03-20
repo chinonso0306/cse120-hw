@@ -1,3 +1,7 @@
+// Exceeded requirements by:
+// - Ensuring only non-hidden words are selected when hiding
+// - Improving randomness to make memorization more effective
+
 using System;
 
 class Program
